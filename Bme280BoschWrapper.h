@@ -3,12 +3,14 @@
 
 #include <bme280.h>
 
+typedef void (*delay_callback)(uint32_t msec, void *dev_addr);
+
 class Bme280BoschWrapper
 {
   public:
     //true: uses forced mode, sensore measures values on demand
     //false: uses continuous measuring mode
-    Bme280BoschWrapper(bool forcedMode);
+    Bme280BoschWrapper(bool forcedMode, delay_callback = nullptr);
 
     bool beginI2C(uint8_t dev_addr = 0x77);
     bool beginSPI(int8_t cspin);
@@ -25,6 +27,9 @@ class Bme280BoschWrapper
 
     //Air pressure in Pa
     uint32_t getPressure();
+
+    //Set a custom delay callback
+    void     setDelayCallback(delay_callback delayCallback);
 
   private:
     void I2CInit();
@@ -46,6 +51,7 @@ class Bme280BoschWrapper
     bool error = false;
     uint32_t _req_delay;
     uint8_t  _dev_addr;
+    delay_callback m_delayCallback;
 };
 
 #endif

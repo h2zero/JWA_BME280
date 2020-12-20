@@ -10,9 +10,14 @@
 
 int Bme280BoschWrapper::_cs = -1;
 
-Bme280BoschWrapper::Bme280BoschWrapper(bool forced)
+Bme280BoschWrapper::Bme280BoschWrapper(bool forced, delay_callback callback)
 {
   this->forced = forced;
+  m_delayCallback = callback;
+}
+
+void Bme280BoschWrapper::setDelayCallback(delay_callback delayCallback) {
+    m_delayCallback = delayCallback;
 }
 
 bool Bme280BoschWrapper::beginI2C(uint8_t dev_addr)
@@ -47,7 +52,6 @@ bool Bme280BoschWrapper::beginSPI(int8_t cspin)
 bool Bme280BoschWrapper::measure()
 {
   int8_t ret = BME280_OK;
-
   if(forced)
   {
     ret += bme280_set_sensor_mode(BME280_FORCED_MODE, &bme280);
@@ -225,7 +229,12 @@ int8_t Bme280BoschWrapper::SPIWrite(uint8_t reg_addr, const uint8_t *reg_data, u
 
 void Bme280BoschWrapper::delayusec(uint32_t usec, void *dev)
 {
-  delayMicroseconds(usec);
+  Bme280BoschWrapper *pDev = (Bme280BoschWrapper*)dev;
+  if(pDev->m_delayCallback != nullptr) {
+    pDev->m_delayCallback(usec, dev);
+  } else {
+    delayMicroseconds(usec);
+  }
 }
 
 int8_t Bme280BoschWrapper::setSensorSettings()
