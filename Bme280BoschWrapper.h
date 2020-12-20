@@ -30,12 +30,12 @@ class Bme280BoschWrapper
     void I2CInit();
     void SPIInit();
     int8_t setSensorSettings();
-  
-    static int8_t I2CRead(uint8_t dev_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t cnt);
-    static int8_t I2CWrite(uint8_t dev_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t cnt);
-    static int8_t SPIRead(uint8_t dev_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t cnt);
-    static int8_t SPIWrite(uint8_t dev_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t cnt);
-    static void delaymsec(uint32_t msec);
+
+    static int8_t I2CRead(uint8_t reg_addr, uint8_t *reg_data, uint32_t cnt, void *dev_addr);
+    static int8_t I2CWrite(uint8_t reg_addr, const uint8_t *reg_data, uint32_t cnt, void *dev_addr);
+    static int8_t SPIRead(uint8_t reg_addr, uint8_t *reg_data, uint32_t cnt, void *dev_addr);
+    static int8_t SPIWrite(uint8_t reg_addr, const uint8_t *reg_data, uint32_t cnt, void *dev_addr);
+    static void delayusec(uint32_t usec, void *dev);
 
     static int _cs;
 
@@ -44,6 +44,8 @@ class Bme280BoschWrapper
 
     bool forced;
     bool error = false;
+    uint32_t _req_delay;
+    uint8_t  _dev_addr;
 };
 
 #endif
