@@ -12,8 +12,17 @@ class Bme280BoschWrapper
     //false: uses continuous measuring mode
     Bme280BoschWrapper(bool forcedMode, delay_callback = nullptr);
 
-    bool beginI2C(uint8_t dev_addr = 0x77);
-    bool beginSPI(int8_t cspin);
+    bool beginI2C(uint8_t dev_addr = 0x77,
+                  uint8_t osr_t = BME280_OVERSAMPLING_16X,
+                  uint8_t osr_h = BME280_OVERSAMPLING_16X,
+                  uint8_t osr_p = BME280_OVERSAMPLING_16X,
+                  uint8_t filter = BME280_FILTER_COEFF_OFF);
+
+    bool beginSPI(int8_t cspin,
+                  uint8_t osr_t = BME280_OVERSAMPLING_16X,
+                  uint8_t osr_h = BME280_OVERSAMPLING_16X,
+                  uint8_t osr_p = BME280_OVERSAMPLING_16X,
+                  uint8_t filter = BME280_FILTER_COEFF_OFF);
 
     //this method performs measurement
     //be sure to call it before reading values
@@ -30,6 +39,12 @@ class Bme280BoschWrapper
 
     //Set a custom delay callback
     void     setDelayCallback(delay_callback delayCallback);
+
+    //Set the oversample and filtering
+    bool     setSampleFilterSettings(uint8_t osr_t = BME280_OVERSAMPLING_16X,
+                                  uint8_t osr_h = BME280_OVERSAMPLING_16X,
+                                  uint8_t osr_p = BME280_OVERSAMPLING_16X,
+                                  uint8_t filter = BME280_FILTER_COEFF_OFF);
 
   private:
     void I2CInit();

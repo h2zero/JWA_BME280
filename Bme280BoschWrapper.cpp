@@ -20,11 +20,15 @@ void Bme280BoschWrapper::setDelayCallback(delay_callback delayCallback) {
     m_delayCallback = delayCallback;
 }
 
-bool Bme280BoschWrapper::beginI2C(uint8_t dev_addr)
+bool Bme280BoschWrapper::beginI2C(uint8_t dev_addr, uint8_t osr_t, uint8_t osr_h, uint8_t osr_p, uint8_t filter)
 {
   I2CInit();
   _dev_addr = dev_addr;
   bme280.intf_ptr = this;
+  bme280.settings.osr_h = osr_h;
+  bme280.settings.osr_p = osr_p;
+  bme280.settings.osr_t = osr_t;
+  bme280.settings.filter = filter;
 
   int8_t ret = bme280_init(&bme280);
 
@@ -35,12 +39,17 @@ bool Bme280BoschWrapper::beginI2C(uint8_t dev_addr)
   return (ret == BME280_OK);
 }
 
-bool Bme280BoschWrapper::beginSPI(int8_t cspin)
+bool Bme280BoschWrapper::beginSPI(int8_t cspin, uint8_t osr_t, uint8_t osr_h, uint8_t osr_p, uint8_t filter)
 {
   Bme280BoschWrapper::_cs = cspin;
 
   SPIInit();
   pinMode(_cs, OUTPUT);
+
+  bme280.settings.osr_h = osr_h;
+  bme280.settings.osr_p = osr_p;
+  bme280.settings.osr_t = osr_t;
+  bme280.settings.filter = filter;
 
   int8_t ret = bme280_init(&bme280);
 
@@ -237,15 +246,21 @@ void Bme280BoschWrapper::delayusec(uint32_t usec, void *dev)
   }
 }
 
+bool Bme280BoschWrapper::setSampleFilterSettings(uint8_t osr_t, uint8_t osr_h, uint8_t osr_p, uint8_t filter)
+{
+  bme280.settings.osr_h = osr_h;
+  bme280.settings.osr_p = osr_p;
+  bme280.settings.osr_t = osr_t;
+  bme280.settings.filter = filter;
+
+  return (setSensorSettings() == BME280_OK);
+}
+
 int8_t Bme280BoschWrapper::setSensorSettings()
 {
   int8_t ret = BME280_OK;
 
   uint8_t settings_sel;
-
-  bme280.settings.osr_h = BME280_OVERSAMPLING_16X;
-  bme280.settings.osr_p = BME280_OVERSAMPLING_16X;
-  bme280.settings.osr_t = BME280_OVERSAMPLING_16X;
 
   settings_sel = BME280_OSR_PRESS_SEL|BME280_OSR_TEMP_SEL|BME280_OSR_HUM_SEL;
 
